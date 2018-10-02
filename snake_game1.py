@@ -13,20 +13,22 @@ max_up = scr_height/2 - 10
 max_down = -scr_height/2 + 10
 
 # SNAKE AND FOOD CONSTANTS
-# colors
+# COLORS
 head_color = 'black'
 segment_color = 'blue'
 food_color = 'red'
-# shapes
+score_color = 'white'
+# SHAPES
 head_shape = 'square'
 segment_shape = 'square'
 food_shape = 'circle'
-# initial postions
+# INITIAL PSOTIONS
 head_init_pos = (0, 0)
 food_init_pos = (0, 100)
+score_init_pos = (0, 260)
 
 # UPDATE CONSTANTS
-delay_time_per_update = 0.1
+init_delay_time_per_update = delay_time_per_update = 0.1
 head_move_per_update = 20
 delay_time_on_collision = 1
 
@@ -59,6 +61,22 @@ food.speed(0)
 food.color(food_color)
 food.penup()
 food.goto(food_init_pos)
+
+
+def write_score(pen):
+    pen.write(f"Score : {pen.score}  High Score : {pen.high_score}",
+              align='center', font=('Courier', 24, 'normal'))
+
+
+pen = turtle.Turtle(shape='square')
+pen.speed(0)
+pen.color('white')
+pen.penup()
+pen.goto(score_init_pos)
+pen.hideturtle()
+pen.score = 0
+pen.high_score = 0
+write_score(pen)
 
 segments = []  # LIST OF SNAKE BODY SEGMENTS
 
@@ -115,6 +133,10 @@ def reset():
     head.goto(head_init_pos)
     head.direction = 's'
     food.goto(food_init_pos)
+    delay_time_per_update = init_delay_time_per_update
+    pen.score = 0
+    pen.clear()
+    write_score(pen)
 
 
 # MAIN GAME LOOP
@@ -129,8 +151,9 @@ while True:
     for i in segments:
         if head.distance(i) < 20:
             reset()
+
     # CHECK FOR COLLISION WITH FOOD
-    if head.distance(food) < 20:
+    if head.distance(food) < 15:
 
         # MOVE FOOD TO RANDOM POSITION
         food.goto(randint(max_left, max_right), randint(max_down, max_up))
@@ -140,6 +163,13 @@ while True:
         new_segment.color(segment_color)
         new_segment.penup()
         segments.append(new_segment)
+        pen.score += 1
+        if pen.score > pen.high_score:
+            pen.high_score = pen.score
+        pen.clear()
+        write_score(pen)
+        # CHANGE DELAY TIME
+        delay_time_per_update -= 0.001
 
     # MOVE SEGMENTS WITH HEAD
     for i in range(len(segments)-1, 0, -1):
