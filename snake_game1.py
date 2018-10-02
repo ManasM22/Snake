@@ -7,6 +7,10 @@ scr_width = 600
 scr_height = 600
 init_bg_color = 'green'
 init_title = 'SNAKE GAME'
+max_left = -scr_width/2 + 10
+max_right = scr_width/2 - 10
+max_up = scr_height/2 - 10
+max_down = -scr_height/2 + 10
 
 # SNAKE AND FOOD CONSTANTS
 # colors
@@ -22,8 +26,9 @@ head_init_pos = (0, 0)
 food_init_pos = (0, 100)
 
 # UPDATE CONSTANTS
-delay_time = 0.1
+delay_time_per_update = 0.1
 head_move_per_update = 20
+delay_time_on_collision = 1
 
 # KEYS
 up_key = 'w'
@@ -53,26 +58,31 @@ food.shape(food_shape)
 food.speed(0)
 food.color(food_color)
 food.penup()
-food.goto(0, 100)
+food.goto(food_init_pos)
 
+segments = []  # LIST OF SNAKE BODY SEGMENTS
 
 # FUNCTIONS TO EXECUTE WHEN KEYS ARE PRESSED
 
 
 def on_up_press():
-    head.direction = 'up'
+    if head.direction != 'd':
+        head.direction = 'u'
 
 
 def on_dn_press():
-    head.direction = 'dn'
+    if head.direction != 'u':
+        head.direction = 'd'
 
 
 def on_lf_press():
-    head.direction = 'lf'
+    if head.direction != 'r':
+        head.direction = 'l'
 
 
 def on_rt_press():
-    head.direction = 'rt'
+    if head.direction != 'l':
+        head.direction = 'r'
 
 
 # LISTENERS FOR KEY PRESS
@@ -86,29 +96,44 @@ window.onkeypress(on_rt_press, right_key)  # When d is pressed, head.direction =
 
 
 def move():
-    if head.direction == 'up':
+    if head.direction == 'u':
         head.sety(head.ycor() + head_move_per_update)
-    elif head.direction == 'dn':
+    elif head.direction == 'd':
         head.sety(head.ycor() - head_move_per_update)
-    elif head.direction == 'lf':
+    elif head.direction == 'l':
         head.setx(head.xcor() - head_move_per_update)
-    elif head.direction == 'rt':
+    elif head.direction == 'r':
         head.setx(head.xcor() + head_move_per_update)
 
 
-segments = []  # LIST OF SNAKE BODY SEGMENTS
+# RESET THE GAME
+def reset():
+    sleep(delay_time_on_collision)
+    for i in segments:
+        i.goto(9999, 9999)
+    segments.clear()
+    head.goto(head_init_pos)
+    head.direction = 's'
+    food.goto(food_init_pos)
+
 
 # MAIN GAME LOOP
 while True:
     window.update()
 
+    # CHECK BORDER COLLISION
+    if head.xcor() > max_right or head.xcor() < max_left or head.ycor() < max_down or head.ycor() > max_up:
+        reset()
+
+    # CHECK COLLISION WITH SEGMENTS
+    for i in segments:
+        if head.distance(i) < 20:
+            reset()
     # CHECK FOR COLLISION WITH FOOD
     if head.distance(food) < 20:
 
         # MOVE FOOD TO RANDOM POSITION
-        w = scr_width/2
-        h = scr_height/2
-        food.goto(randint(-w+10, w-10), randint(-h+10, h-10))
+        food.goto(randint(max_left, max_right), randint(max_down, max_up))
 
         # ADD NEW SNAKE BODY SEGMENT
         new_segment = turtle.Turtle(shape=segment_shape)
@@ -122,6 +147,6 @@ while True:
     if len(segments) > 0:
         segments[0].goto(head.xcor(), head.ycor())
     move()
-    sleep(delay_time)
+    sleep(delay_time_per_update)
 
 window.mainloop()
