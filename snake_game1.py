@@ -1,5 +1,6 @@
 import turtle
 from time import sleep
+from random import randint
 
 # FORMING SCREEN
 window = turtle.Screen()
@@ -16,6 +17,15 @@ head.color("black")
 head.penup()
 head.goto(0, 0)
 head.direction = 'stop'
+
+# MAKING FOOD
+food = turtle.Turtle()
+food.shape("circle")
+food.speed(2)
+food.color('red')
+food.penup()
+food.goto(0, 100)
+
 
 # FUNCTIONS TO EXECUTE WHEN KEYS ARE PRESSED
 
@@ -48,24 +58,41 @@ window.onkeypress(on_rt_press, 'd')  # When d is pressed, head.direction = rt (r
 
 def move():
     if head.direction == 'up':
-        head.sety(head.ycor() + 10)
+        head.sety(head.ycor() + 20)
     elif head.direction == 'dn':
-        head.sety(head.ycor() - 10)
+        head.sety(head.ycor() - 20)
     elif head.direction == 'lf':
-        head.setx(head.xcor() - 10)
+        head.setx(head.xcor() - 20)
     elif head.direction == 'rt':
-        head.setx(head.xcor() + 10)
-    else:
-        print("ERROR : Invalid head.direction value.")
+        head.setx(head.xcor() + 20)
 
 
 # DELAY TIME FUNCTION FOR EACH UPDATE
-delay = 0.05
+delay = 0.1
 
+segments = []  # LIST OF SNAKE BODY SEGMENTS
 
 # MAIN GAME LOOP
 while True:
     window.update()
+
+    # CHECK FOR COLLISION WITH FOOD
+    if head.distance(food) < 20:
+
+        # MOVE FOOD TO RANDOM POSITION
+        food.goto(randint(-290, 290), randint(-290, 290))
+
+        # ADD NEW SNAKE BODY SEGMENT
+        new_segment = turtle.Turtle(shape="square")
+        new_segment.color('blue')
+        new_segment.penup()
+        segments.append(new_segment)
+
+    # MOVE SEGMENTS WITH HEAD
+    for i in range(len(segments)-1, 0, -1):
+        segments[i].goto(segments[i-1].xcor(), segments[i-1].ycor())
+    if len(segments) > 0:
+        segments[0].goto(head.xcor(), head.ycor())
     move()
     sleep(delay)
 
