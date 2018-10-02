@@ -1,4 +1,5 @@
 import turtle
+from time import sleep
 
 # FORMING SCREEN
 window = turtle.Screen()
@@ -37,10 +38,10 @@ def on_rt_press():
 
 # LISTENERS FOR KEY PRESS
 window.listen()
-window.onkeypress(on_up_press(), 'w')  # When w is pressed, head.direction = up
-window.onkeypress(on_dn_press(), 's')  # When s is pressed, head.direction = dn (down)
-window.onkeypress(on_lf_press(), 'a')  # When a is pressed, head.direction = lf (left)
-window.onkeypress(on_rt_press(), 'd')  # When d is pressed, head.direction = rt (right)
+window.onkeypress(on_up_press, 'w')  # When w is pressed, head.direction = up
+window.onkeypress(on_dn_press, 's')  # When s is pressed, head.direction = dn (down)
+window.onkeypress(on_lf_press, 'a')  # When a is pressed, head.direction = lf (left)
+window.onkeypress(on_rt_press, 'd')  # When d is pressed, head.direction = rt (right)
 
 # FUNCTION TO MOVE SNAKE
 
@@ -59,9 +60,7 @@ def move():
 
 
 # DELAY TIME FUNCTION FOR EACH UPDATE
-from time import sleep
-
-delay = 0.06
+delay = 0.05
 
 
 # MAIN GAME LOOP
